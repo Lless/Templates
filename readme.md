@@ -1,0 +1,1 @@
+Chrome extension that allows to replace text shortcut with saved template by pressing tab button
