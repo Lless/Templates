@@ -1,10 +1,12 @@
-function getTemplateNode(snippet) {
-    return document.createTextNode("Wow");
+function getTemplate(snippet) {
+    if (snippet == "such") return "wow";
+    return null;
 }
 
-function replaceHandler(event) {
+//returns true if snippet replaced, false otherwise
+function replaceContentEditable() {
     var node = document.getSelection().focusNode;
-    if (!node || !node.parentElement.isContentEditable) return;
+    if (!node || !node.parentElement.isContentEditable) return false;
     
     var wordRange = new Range();
     wordRange.setStart(node, 0); //dummy word start
@@ -15,14 +17,37 @@ function replaceHandler(event) {
     wordRange.setStart(node, trueWordStart);
     console.log(wordRange.toString());
 
-    var template = getTemplateNode(wordRange.toString());
-    if (!template) return;
+    var template = getTemplate(wordRange.toString());
+    if (!template) return false;
     wordRange.deleteContents();
-    wordRange.insertNode(template);
-    template.parentNode.normalize();
+    wordRange.insertNode(document.createTextNode(template));
+    node.normalize();
+    return true;
+}    
 
-    event.preventDefault();
-    event.stopPropagation();
+//returns true if snippet replaced, false otherwise
+function replaceInputAndTextarea(input) {
+    if(!(input.value) || !(input.selectionEnd) || input.readOnly || input.disabled) {
+        console.log("not input");
+        return false;
+    }
+
+    var word = input.value.substring(0, input.selectionEnd)
+    var wordStart = Math.max(word.lastIndexOf(" "), word.lastIndexOf("\n")) + 1;
+    word = word.substring(wordStart);
+    var template = getTemplate(word);
+    console.log(word);
+
+    if (!template) return false;
+    input.value = input.value.substring(0, wordStart) 
+                + getTemplate(word) 
+                + input.value.substring(input.selectionEnd);
+    return true;
 }
 
-Mousetrap.bindGlobal("tab", replaceHandler);
+Mousetrap.bindGlobal("tab", event => {
+    if (replaceContentEditable() || replaceInputAndTextarea(event.target)) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+});
