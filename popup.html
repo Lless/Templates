@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Template editor</title>
+    <script src="js/libs/vue.js"></script>
+    <script src="js/popup.js" defer></script>
+    <style> 
+        body {
+            min-width: 250px;
+            min-height: 150px;
+        }   
+    </style>
+</head>
+<body>
+    <div id="app">
+        <templatecard v-for="template in templates" v-bind:tmplt="template" v-bind:key="template[0]"></templatecard>
+    </div>
+</body>
+</html>
