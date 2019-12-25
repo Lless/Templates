@@ -1,0 +1,7 @@
+.btn-edit {
+    width: 12px !important;
+    height: 12px !important;
+    padding: 2px;
+    background-image: url(/img/edit.png); 
+    background-size: 10px;
+}
