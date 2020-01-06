@@ -1,0 +1,12 @@
+body {
+    min-width: 400px;
+    min-height: 300px;
+}
+
+h5{
+    text-align: center;
+}
+
+li:hover {
+    background-color: WhiteSmoke
+}
