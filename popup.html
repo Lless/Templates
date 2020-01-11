@@ -9,7 +9,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="http://localhost:8098"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="css/popup.css">
@@ -17,12 +16,14 @@
 </head>
 <body>
     <div id="app">
-        <h5>Templates</h5>
-        <ul class="list-group list-group-flush">
-            <template-item v-for="template in templates" v-bind:snippet="template[0]" v-bind:key="template[0]" v-bind:template="template[1]"></templatecard>
-        </ul>
-        <br>
-        <template-editor></template-editor>
+        <nav class="nav nav-fill nav-pills sticky-top">
+                <span v-for="tab in tabs" v-bind:key="tab" v-on:click="currentTab = tab"
+                    v-bind:class="['nav-item', 'nav-link', { active: currentTab === tab }]">
+                    {{tab}}
+                </span> 
+        </nav>
+        <templates v-show="currentTab==='Templates'"></templates>
+        <editor v-show="currentTab==='Editor'"></editor>
     </div>
 </body>
 </html>

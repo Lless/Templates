@@ -12,7 +12,7 @@
 
     "permissions": [],
 
-    "content_security_policy": "script-src 'self' 'unsafe-eval' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com/ http://localhost:8098; object-src 'self'",
+    "content_security_policy": "script-src 'self' 'unsafe-eval' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com/; object-src 'self'",
 
     "content_scripts" : [
         {
@@ -20,9 +20,9 @@
             "js" : ["js/libs/mousetrap.changed.js", "js/libs/mousetrap-global-bind.js", "js/contentScript.js"]
         }
     ],
-    
+
     "browser_action": {
         "default_icon" : "img/icon16.png",
         "default_popup" : "popup.html"
     }
-}
+}   
