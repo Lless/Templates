@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Templates",
-    "version": "0.02",
+    "version": "0.03",
     "description": "Allows to replace text shortcut with saved template by pressing tab button",
 
     "icons": {

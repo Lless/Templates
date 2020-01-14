@@ -16,16 +16,39 @@ Vue.component('editor', {
     },
     methods: {
         onSubmit: function(event) {
-            this.$root.$emit('set-template', this.snippet, this.template, this.prevSnippet);
-            this.onReset();
-            //this.$root.$emit('set-tab', "Templates");
             event.preventDefault();
+            var change = {};
+            change[this.snippet] = this.template;
+            if (this.prevSnippet && this.prevSnippet == this.snippet) {
+                chrome.storage.sync.set(change);
+                this.$root.$emit('set-tab', "Templates");
+                this.onReset();
+                return;
+            }
+           
+            if (this.snippet.match(/\s/)) {
+                console.log("snippet should not contain whitespaces, tabs or other space characters")
+                return;
+            }
+            chrome.storage.sync.get(this.snippet, res => {
+                if (Object.keys(res).length != 0)  {
+                    console.log("snippet in use");
+                    return;
+                }
+                if (this.prevSnippet) chrome.storage.sync.remove(this.prevSnippet);
+                chrome.storage.sync.set(change);
+                this.$root.$emit('set-tab', "Templates");
+                this.onReset();
+            })
         },
+
         onRemove: function() {
+            chrome.storage.sync.remove(this.prevSnippet)
+
             this.$root.$emit('set-tab', "Templates");
-            this.$root.$emit('remove-template', this.prevSnippet);
             this.onReset();
         },
+
         onReset: function() {
             Object.assign(this.$data, this.$options.data());
         }
