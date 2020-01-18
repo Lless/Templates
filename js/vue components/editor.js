@@ -13,10 +13,11 @@ Vue.component('editor', {
             editor.snippet = snippet;
             editor.template = template;
         });
-       $('textarea').on('input', function () {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-          });
+        document.getElementById('editorTemplateField')
+            .addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
     },
 
     updated: function() {
@@ -71,10 +72,15 @@ Vue.component('editor', {
     },  
     template: 
         '<form id="editor" class="m-1" v-on:submit="onSubmit">' + 
-            '<div class="form-group row d-flex align-items-center">' +
-                '<label class="col-auto" for="snippet">Snippet:</label>' + 
-                '<input v-model="snippet" type="text" id="snippet" class="form-control col mr-3"' + 
-                    'placeholder="New snippet" required>' + 
+            '<div class="form-group">' + 
+                '<div class="row d-flex align-items-center">' +
+                    '<label class="col-auto" for="snippet">Snippet:</label>' + 
+                    '<input v-model="snippet" type="text" id="snippet" class="form-control col mr-3"' + 
+                        'placeholder="New snippet" required>' + 
+                '</div>' +
+                '<small v-if="prevSnippet && prevSnippet != snippet" class="form-text text-muted">' +
+                    'previous: {{prevSnippet}}'+
+                '</small>' +
             '</div>' +
             '<textarea v-model="template" class="form-control"' + 
             'placeholder="New template" id="editorTemplateField" required></textarea>' + 
