@@ -1,10 +1,5 @@
 body {
     min-width: 700px;
-    min-height: 300px;
-}
-
-li:hover {
-    background-color: WhiteSmoke
 }
 
 #editorTemplateField {

@@ -1,7 +1,7 @@
 Vue.component('template-item', {
     props: ['snippet', 'template'],
     template: 
-        '<li class="list-group-item" title="Click to edit" v-on:click="editTemplate">' + 
+        '<li class="list-group-item list-group-item-action" title="Click to edit" v-on:click="editTemplate">' + 
             '<span class="badge badge-primary rounded-pill mr-1">' + 
                 '{{snippet}}' + 
             '</span>' + 
