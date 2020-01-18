@@ -11,11 +11,11 @@ new Vue({
     },
     template:
         '<div>' +
-            '<nav class="nav nav-fill nav-pills sticky-top">' +
-                    '<span v-for="tab in tabs" v-bind:key="tab" v-on:click="currentTab = tab"' +
-                        'v-bind:class="[\'nav-item\', \'nav-link\', { active: currentTab === tab }]">' +
-                        '{{tab}}' +
-                    '</span> ' +
+            '<nav class="nav nav-fill nav-pills sticky-top" style="background-color: white;">' +
+                '<span v-for="tab in tabs" v-bind:key="tab" v-on:click="currentTab = tab"' +
+                    'v-bind:class="[\'nav-item\', \'nav-link\', { active: currentTab === tab }]">' +
+                    '{{tab}}' +
+                '</span> ' +
             '</nav>' +
             '<templates v-show="currentTab===\'Templates\'"></templates>' +
             '<editor v-show="currentTab===\'Editor\'"></editor>' +
