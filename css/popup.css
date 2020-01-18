@@ -1,8 +1,13 @@
 body {
-    min-width: 400px;
+    min-width: 700px;
     min-height: 300px;
 }
 
 li:hover {
     background-color: WhiteSmoke
+}
+
+#editorTemplateField {
+    overflow-y: hidden;
+    resize: none;
 }

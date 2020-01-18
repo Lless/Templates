@@ -13,7 +13,18 @@ Vue.component('editor', {
             editor.snippet = snippet;
             editor.template = template;
         });
+       $('textarea').on('input', function () {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+          });
     },
+
+    updated: function() {
+        var template = document.getElementById("editorTemplateField");
+        template.style.height = 'auto';
+        template.style.height = (template.scrollHeight) + 'px';
+    },
+
     methods: {
         onSubmit: function(event) {
             event.preventDefault();
@@ -44,7 +55,6 @@ Vue.component('editor', {
 
         onRemove: function() {
             chrome.storage.sync.remove(this.prevSnippet)
-
             this.$root.$emit('set-tab', "Templates");
             this.onReset();
         },
@@ -67,7 +77,7 @@ Vue.component('editor', {
                     'placeholder="New snippet" required>' + 
             '</div>' +
             '<textarea v-model="template" class="form-control"' + 
-            'placeholder="New template" required></textarea>' + 
+            'placeholder="New template" id="editorTemplateField" required></textarea>' + 
             '<div class="row m-2 d-flex justify-content-around">' + 
                 '<button type="submit" class="btn btn-primary">{{formSendButtonName}}</button>' +
                 '<button type="button" class="btn btn-primary" v-on:click="onReset">Reset</button>' +
