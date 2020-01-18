@@ -15,18 +15,22 @@ async function replaceContentEditable() {
     var wordRange = new Range();
     wordRange.setStart(node, 0); //dummy word start
     wordRange.setEnd(node, document.getSelection().focusOffset);
-
+    console.log(node);
     var trueWordStart = Math.max(wordRange.toString().lastIndexOf(" "), 
                                 wordRange.toString().lastIndexOf("\n")) + 1;
     wordRange.setStart(node, trueWordStart);
     console.log("found snippet: " + wordRange.toString());
 
     var template = await getTemplate(wordRange.toString());
-    console.log("found template: " + template);
     if (!template) return false;
+    template = template.replace(/\n/g, "<br>")
+    console.log("found template: " + template);
     wordRange.deleteContents();
-    wordRange.insertNode(document.createTextNode(template));
+    var newNode = document.createElement("div");
+    newNode.innerHTML = template;
+    wordRange.insertNode(newNode);
     node.normalize();
+    console.log(node);
     return true;
 }    
 
@@ -41,8 +45,8 @@ async function replaceInputAndTextarea(input) {
     console.log("found snippet: " + word);
 
     var template = await getTemplate(word);
-    console.log("found template: " + template);
     if (!template) return false;
+    console.log("found template: " + template);
     input.value = input.value.substring(0, wordStart) 
                 + template
                 + input.value.substring(input.selectionEnd);
