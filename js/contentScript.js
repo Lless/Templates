@@ -9,26 +9,43 @@ async function getTemplate(snippet) {
 
 //returns true if snippet replaced, false otherwise
 async function replaceContentEditable() {
-    var node = document.getSelection().focusNode;
+    var selection = document.getSelection();
+    var node = selection.focusNode;
     if (!node || !node.parentElement.isContentEditable) return false;
-    
-    var wordRange = new Range();
-    wordRange.setStart(node, 0); //dummy word start
-    wordRange.setEnd(node, document.getSelection().focusOffset);
-    var trueWordStart = Math.max(wordRange.toString().lastIndexOf(" "), 
-                                wordRange.toString().lastIndexOf("\n")) + 1;
-    wordRange.setStart(node, trueWordStart);
-    console.log("found snippet: " + wordRange.toString());
+    while (node.hasChildNodes()) { 
+        node = node.firstChild;
+    }
 
-    var template = await getTemplate(wordRange.toString());
-    if (!template) return false;
+    var range = new Range();
+    range.setStart(node, 0); //dummy word start
+    range.setEnd(selection.focusNode, selection.focusOffset);
+    var trueWordStart = Math.max(range.toString().lastIndexOf(" "), 
+                                range.toString().lastIndexOf("\n")) + 1;
+    range.setStart(node, trueWordStart); 
+
+    console.log("search snippet: " + range.toString());
+    var template = await getTemplate(range.toString());
+    if (!template) { 
+        console.log("nothing found");
+        return false;
+    }
     console.log("found template: " + template);
-    template = template.replace(/\n/g, "<br>")
-    wordRange.deleteContents();
-    var newNode = document.createElement("div");
-    newNode.innerHTML = template;
-    wordRange.insertNode(newNode);
-    node.normalize();
+
+    range.deleteContents();
+    var fragment = new DocumentFragment();
+    var lines = template.split("\n");
+    for (let i = 0; i < lines.length-1; i++) {
+      fragment.appendChild(document.createTextNode(lines[i]));
+      fragment.appendChild(document.createElement("br"));
+    }
+    fragment.appendChild(document.createTextNode(lines[lines.length-1]));
+    node.parentElement.style["white-space"] = "pre-wrap"; //otherwise spaces in the end of line can dissapear
+    range.insertNode(fragment);
+    node.parentNode.normalize(); //unite text nodes
+
+    range.collapse(); 
+    selection.empty();
+    selection.addRange(range);
     return true;
 }    
 
@@ -40,20 +57,33 @@ async function replaceInputAndTextarea(input) {
     var word = input.value.substring(0, input.selectionEnd)
     var wordStart = Math.max(word.lastIndexOf(" "), word.lastIndexOf("\n")) + 1;
     word = word.substring(wordStart);
-    console.log("found snippet: " + word);
 
+    console.log("search snippet: " + word);
     var template = await getTemplate(word);
-    if (!template) return false;
+    if (!template) { 
+        console.log("nothing found");
+        return false;
+    }
     console.log("found template: " + template);
     input.value = input.value.substring(0, wordStart) 
                 + template
                 + input.value.substring(input.selectionEnd);
+
+    input.setSelectionRange(wordStart + template.length, wordStart + template.length);
+    input.focus();  
     return true;
 }
 
-Mousetrap.bindGlobal("tab", async event => {
-    if ((await replaceContentEditable()) || (await replaceInputAndTextarea(event.target))) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
+Mousetrap.bindGlobal("tab", event => {
+    if (event.__templateChecked) return;
+    let newEvent = new KeyboardEvent(event.type, event);
+    newEvent.__templateChecked = true;
+
+    //cancel this event, dispatch new, if nothing replaced
+    event.preventDefault();
+    event.stopPropagation();
+    
+    replaceContentEditable()
+        .then(isReplaced => {return isReplaced || replaceInputAndTextarea(event.target)})
+        .then(isReplaced => {if (!isReplaced) event.target.dispatchEvent(newEvent)});
 });
