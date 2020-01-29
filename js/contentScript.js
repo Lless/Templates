@@ -8,38 +8,35 @@ async function getTemplate(snippet) {
 }
 
 //returns true if snippet replaced, false otherwise
-async function replaceContentEditable() {
-    var selection = document.getSelection();
-    var node = selection.focusNode;
-    if (!node || !node.parentElement.isContentEditable) return false;
-    while (node.hasChildNodes()) { 
-        node = node.firstChild;
-    }
+async function tryReplaceContentEditable(node) {
+    if (!node || !node.isContentEditable) return false;
+    node.style["white-space"] = "pre-wrap"; //otherwise spaces in the end of line can dissapear
 
-    var range = new Range();
-    range.setStart(node, 0); //dummy word start
-    range.setEnd(selection.focusNode, selection.focusOffset);
-    var trueWordStart = Math.max(range.toString().lastIndexOf(" "), 
-                                range.toString().lastIndexOf("\n")) + 1;
-    range.setStart(node, trueWordStart); 
+    let selection = document.getSelection();
+    node = selection.focusNode;
+    let caretPosition = selection.focusOffset;
+    let execResult = /(\s|^)(\S*)$/.exec(node.textContent.substring(0, caretPosition));
 
-    console.log("search snippet: " + range.toString());
-    var template = await getTemplate(range.toString());
+    console.log("search snippet: " + execResult[2]);
+    let template = await getTemplate(execResult[2]);
     if (!template) { 
         console.log("nothing found");
         return false;
     }
     console.log("found template: " + template);
 
-    range.deleteContents();
-    var fragment = new DocumentFragment();
-    var lines = template.split("\n");
+    let fragment = new DocumentFragment();
+    let lines = template.split("\n");
     for (let i = 0; i < lines.length-1; i++) {
       fragment.appendChild(document.createTextNode(lines[i]));
       fragment.appendChild(document.createElement("br"));
     }
     fragment.appendChild(document.createTextNode(lines[lines.length-1]));
-    node.parentElement.style["white-space"] = "pre-wrap"; //otherwise spaces in the end of line can dissapear
+
+    let range = new Range();
+    range.setStart(node, execResult.index + (execResult[1] == "" ? 0 : 1));
+    range.setEnd(node, caretPosition);
+    range.deleteContents();
     range.insertNode(fragment);
     node.parentNode.normalize(); //unite text nodes
 
@@ -50,7 +47,7 @@ async function replaceContentEditable() {
 }    
 
 //returns true if snippet replaced, false otherwise
-async function replaceInputAndTextarea(input) {
+async function tryReplaceInputAndTextarea(input) {
     if(!(input.value) || !(input.selectionEnd) || input.readOnly || input.disabled) 
         return false;
 
@@ -83,7 +80,9 @@ Mousetrap.bindGlobal("tab", event => {
     event.preventDefault();
     event.stopPropagation();
     
-    replaceContentEditable()
-        .then(isReplaced => {return isReplaced || replaceInputAndTextarea(event.target)})
+    tryReplaceContentEditable(event.target)
+        .then(isReplaced => {return isReplaced || tryReplaceInputAndTextarea(event.target)})
         .then(isReplaced => {if (!isReplaced) event.target.dispatchEvent(newEvent)});
 });
+
+console.log("Mousetrap binded");
