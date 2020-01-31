@@ -1,10 +1,11 @@
 Vue.component('templates', {
     data: function() {
-        return templateList = {};
+        return { 
+            templateList: {},
+            filterString: ""
+        };
     },
     mounted: function() {
-        var list = this.templateList;
-
         chrome.storage.sync.get(null, result => {
             this.templateList = result;
             this.$forceUpdate();
@@ -19,9 +20,30 @@ Vue.component('templates', {
             this.$forceUpdate();
         });
     },
+    methods: {
+        filter: function(list) {
+            let result = {};
+            let filter = this.filterString.toLowerCase();
+            for (let key in list) {
+                console.log(filter, key, list[key]);
+                if (key.toLowerCase().includes(filter) ||
+                    list[key].toLowerCase().includes(filter)) 
+                    result[key] = list[key];
+            }
+            return result;
+        }
+    },
     template:
-        '<ul class="list-group list-group-flush">' +
-            '<template-item v-for="snippet in Object.keys(templateList)" v-bind:snippet="snippet" ' + 
-                'v-bind:key="snippet" v-bind:template="templateList[snippet]"></template-item>' +
-        '</ul>'
+        '<div class="mt-1">' +
+            '<div class="input-group mb-1">' +
+                '<div class="input-group-prepend">' +
+                    '<img class="input-group-text" src="/img/find24.png"></img>' +
+                '</div>'+
+                '<input type="text" class="form-control" placeholder="Start typing to filter list" v-model="filterString">' +
+            '</div>' +
+            '<ul class="list-group list-group-flush">' +
+                '<template-item v-for="(template, snippet) in filter(templateList)" v-bind:snippet="snippet" ' + 
+                    'v-bind:key="snippet" v-bind:template="template"></template-item>' +
+            '</ul>' +
+        '</div>'
 })
