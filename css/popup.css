@@ -2,7 +2,11 @@ body {
     min-width: 700px;
 }
 
-#editorTemplateField {
+#editor textarea {
     overflow-y: hidden;
     resize: none;
+}
+
+ #editorSnippetGroup .invalid-feedback {
+    display: block;
 }
