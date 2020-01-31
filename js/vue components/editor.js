@@ -88,28 +88,29 @@ Vue.component('editor', {
     },  
     template: 
         '<form id="editor" class="m-1" v-on:submit="saveTemplate" novalidate>' + 
-            '<div class="form-group" ref="snippetGroup" id="editorSnippetGroup">' + 
-                '<div class="row d-flex align-items-center">' +
-                    '<label class="col-auto" for="editorSnippetField">Snippet:</label>' + 
-                    '<input v-model="snippet" type="text" id="editorSnippetField" ref="snippetField" placeholder="New snippet"' + 
-                        'class="form-control col mr-3" required v-on:input="checkSnippetValidity" pattern="\\S+">' +  
+            '<div class="form-group input-group" ref="snippetGroup" id="editorSnippetGroup">' + 
+                '<div class="input-group-prepend">' +
+                    '<div class="col-auto input-group-text" for="editorSnippetField">Snippet</div>' +
+                '</div>' +
+                '<input v-model="snippet" type="text" id="editorSnippetField" ref="snippetField" placeholder="New snippet"' + 
+                    'class="form-control col" required v-on:input="checkSnippetValidity" pattern="\\S+">' +  
+                '<div class="invalid-feedback">' +
+                    '{{invalidSnippetMessage}}' +
                 '</div>' +
                 '<small v-if="prevSnippet && prevSnippet != snippet" class="form-text text-muted">' +
                     'previous: {{prevSnippet}}'+
                 '</small>' +
-                '<div class="invalid-feedback">' +
-                    '{{invalidSnippetMessage}}' +
-                '</div>' +
             '</div>' +
             '<div ref="templateGroup" class="form-group">' +
                 '<textarea v-model="template" class="form-control" ref="templateField" placeholder="New template"' + 
                     'required v-on:input="setTemplateFieldLength"></textarea>' + 
                 '<div class="invalid-feedback">Template should not be empty</div>' +
             '</div>' +
-            '<div class="row m-2 d-flex justify-content-around">' + 
-                '<button type="submit" class="btn btn-primary">{{formSendButtonName}}</button>' +
-                '<button type="button" class="btn btn-primary" v-on:click="resetForm">Reset</button>' +
-                '<button type="button" v-if="prevSnippet" class="btn btn-primary" v-on:click="removeTemplate">Delete</button>' +
+            '<div class="row m-2 d-flex justify-content-between">' + 
+                '<button type="submit" class="btn m-2 btn-primary">{{formSendButtonName}}</button>' +
+                '<button type="button" v-if="prevSnippet" class="btn btn-primary m-2" v-on:click="removeTemplate">' + 
+                    'Delete template</button>' +
+                '<button type="button" class="btn btn-primary m-2" v-on:click="resetForm">Reset form</button>' +
             '</div>' + 
         '</form>',
 })
