@@ -1,6 +1,9 @@
 async function getTemplate(snippet) {
+    console.log("search snippet: " + snippet);
     let promise = new Promise(resolve => {
         chrome.storage.sync.get(snippet, res => {
+            if (res[snippet]) console.log("found template: " + res[snippet]);
+            else console.log("nothing found");
             resolve(res[snippet]);
         });
     });
@@ -17,34 +20,17 @@ async function tryReplaceContentEditable(node) {
     let caretPosition = selection.focusOffset;
     let execResult = /(\s|^)(\S*)$/.exec(node.textContent.substring(0, caretPosition));
 
-    console.log("search snippet: " + execResult[2]);
     let template = await getTemplate(execResult[2]);
-    if (!template) { 
-        console.log("nothing found");
-        return false;
-    }
-    console.log("found template: " + template);
-
-    let fragment = new DocumentFragment();
-    let lines = template.split("\n");
-    for (let i = 0; i < lines.length-1; i++) {
-      fragment.appendChild(document.createTextNode(lines[i]));
-      fragment.appendChild(document.createElement("br"));
-    }
-    fragment.appendChild(document.createTextNode(lines[lines.length-1]));
+    if (!template) return false;
 
     let range = new Range();
     range.setStart(node, execResult.index + (execResult[1] == "" ? 0 : 1));
     range.setEnd(node, caretPosition);
-    range.deleteContents();
-    range.insertNode(fragment);
-    node.parentNode.normalize(); //unite text nodes
-
-    range.collapse(); 
     selection.empty();
     selection.addRange(range);
-    return true;
-}    
+    document.execCommand("insertText", false, template);
+    return true;    
+}   
 
 //returns true if snippet replaced, false otherwise
 async function tryReplaceInputAndTextarea(input) {
@@ -55,19 +41,11 @@ async function tryReplaceInputAndTextarea(input) {
     var wordStart = Math.max(word.lastIndexOf(" "), word.lastIndexOf("\n")) + 1;
     word = word.substring(wordStart);
 
-    console.log("search snippet: " + word);
     var template = await getTemplate(word);
-    if (!template) { 
-        console.log("nothing found");
-        return false;
-    }
-    console.log("found template: " + template);
-    input.value = input.value.substring(0, wordStart) 
-                + template
-                + input.value.substring(input.selectionEnd);
+    if (!template) return false;
 
-    input.setSelectionRange(wordStart + template.length, wordStart + template.length);
-    input.focus();  
+    input.setSelectionRange(wordStart, input.selectionEnd);
+    document.execCommand("insertText", false, template);
     return true;
 }
 
