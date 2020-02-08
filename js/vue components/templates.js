@@ -44,6 +44,10 @@ Vue.component('templates', {
             '<ul class="list-group list-group-flush">' +
                 '<template-item v-for="(template, snippet) in filter(templateList)" v-bind:snippet="snippet" ' + 
                     'v-bind:key="snippet" v-bind:template="template"></template-item>' +
+                '<br>' +
+                '<small class="text-muted text-center font-italic">' + 
+                    'You can add new templates in the editor' + 
+                '</small>' +
             '</ul>' +
         '</div>'
 })
