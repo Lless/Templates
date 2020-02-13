@@ -13,7 +13,6 @@ async function getTemplate(snippet) {
 //returns true if snippet replaced, false otherwise
 async function tryReplaceContentEditable(node) {
     if (!node || !node.isContentEditable) return false;
-    node.style["white-space"] = "pre-wrap"; //otherwise spaces in the end of line can dissapear
 
     let selection = document.getSelection();
     node = selection.focusNode;
